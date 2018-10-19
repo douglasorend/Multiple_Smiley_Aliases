@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:MultiSmileyAlias</id>
 <name>Multiple Smiley Aliases</name>
-<version>1.1</version>
+<version>1.0</version>
 
 <!-------------------------------------------------------------------------->
 <!-- Source file modifications                                            -->
@@ -149,13 +149,13 @@
 		<add><![CDATA[, aliases]]></add>
 	</operation>
 	<operation>
-		<search position="before"><![CDATA[$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description']);]]></search>
+		<search position="before"><![CDATA[$context['current_smiley']['description'] = $smcFunc['htmlspecialchars']($context['current_smiley']['description']);]]></search>
 		<add><![CDATA[
 
 		if ($context['current_smiley']['aliases'] == '')
 			$context['current_smiley']['aliases'] = array();
 		else
-			$context['current_smiley']['aliases'] = explode(',', htmlspecialchars($context['current_smiley']['aliases']));]]></add>
+			$context['current_smiley']['aliases'] = explode(',', $smcFunc['htmlspecialchars']($context['current_smiley']['aliases']));]]></add>
 	</operation>
 	<operation>
 		<search position="after"><![CDATA[),
@@ -190,7 +190,7 @@
 <file name="$sourcedir/Subs.php">
 	<!-- parseSmileys function -->
 	<operation>
-		<search position="before"><![CDATA[static $smileyPregSearch = array(), $smileyPregReplacements = array()]]></search>
+		<search position="before"><![CDATA[static $smileyPregSearch = null, $smileyPregReplacements = array()]]></search>
 		<add><![CDATA[, $smileyalias = array()]]></add>
 	</operation>
 	<operation>
@@ -219,58 +219,46 @@
 <file name="$themedir/ManageSmileys.template.php">
 	<!-- template_modifysmiley function -->
 	<operation>
-		<search position="before"><![CDATA[<input type="text" name="smiley_code" id="smiley_code" value="', $context['current_smiley']['code'], '" class="input_text" />]]></search>
+		<search position="before"><![CDATA[<input type="text" name="smiley_code" id="smiley_code" value="', $context['current_smiley']['code'], '" class="input_text">]]></search>
 		<add><![CDATA[
-						</dd>
-						<dt>
-							<strong><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </strong>
-						</dt>
-						<dd>';
-			if (count($context['current_smiley']['aliases']) > 0)
-				foreach ($context['current_smiley']['aliases'] as $i => $code)
-					echo ($i > 0 ? '<br />' : '') . '
-					<input type="text" name="smiley_aliases[]" value="', $code, '" />'; 
-		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', count($context['current_smiley']['aliases']) > 0, '); return false;">(', $txt['smileys_add_code'], ')</a></span>]]></add>
-	</operation>
-	<operation>
-		<search position="after"><![CDATA[
-	// ]]]]><![CDATA[></script>';
-}
-
-// Adding a new smiley.]]></search>
-		<add><![CDATA[
-		function addAliases(newline)
-		{
-			setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + \'<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1); return false;"> (', $txt['smileys_add_code'], ')<\a><\span>\');
-		}]]></add>
+					</dd>
+					<dt>
+						<strong><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </strong>
+					</dt>
+					<dd>';
+		if (count($context['current_smiley']['aliases']) > 0)
+			foreach ($context['current_smiley']['aliases'] as $i => $code)
+				echo ($i > 0 ? '<br />' : '') . '
+						<input type="text" name="smiley_aliases[]" value="', $code, '">'; 
+		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', (int) (count($context['current_smiley']['aliases']) > 0), ', \'', $txt['smileys_add_code'], '\'); return false;">(', $txt['smileys_add_code'], ')</a></span>]]></add>
 	</operation>
 
 	<!-- template_addsmiley function -->
 	<operation>
-		<search position="before"><![CDATA[<input type="text" name="smiley_code" id="smiley_code" value="" class="input_text" />]]></search>
+		<search position="before"><![CDATA[<input type="text" name="smiley_code" id="smiley_code" value="" class="input_text">]]></search>
 		<add><![CDATA[
-						</dd>
-						<dt>
-							<strong><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </strong>
-						</dt>
-						<dd>';
-			if (count($context['current_smiley']['aliases']) > 0)
-				foreach ($context['current_smiley']['aliases'] as $i => $code)
-					echo ($i > 0 ? '<br />' : '') . '
-							<input type="text" name="smiley_aliases[]" value="', $code, '" />'; 
-		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', count($context['current_smiley']['aliases']) > 0, '); return false;">(', $txt['smileys_add_code'], ')</a></span>]]></add>
+					</dd>
+					<dt>
+						<strong><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </strong>
+					</dt>
+					<dd>';
+		if (count($context['current_smiley']['aliases']) > 0)
+			foreach ($context['current_smiley']['aliases'] as $i => $code)
+				echo ($i > 0 ? '<br />' : '') . '
+						<input type="text" name="smiley_aliases[]" value="', $code, '">'; 
+		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', (int) (count($context['current_smiley']['aliases']) > 0), ', \'', $txt['smileys_add_code'], '\'); return false;">(', $txt['smileys_add_code'], ')</a></span>]]></add>
 	</operation>
+</file>
+<file name="$themedir/scripts/script.js">
 	<operation>
-		<search position="after"><![CDATA[
-	// ]]]]><![CDATA[></script>';
-}
-
-// Ordering smileys.]]></search>
+		<search position="end" />
 		<add><![CDATA[
-		function addAliases(newline)
-		{
-			setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + \'<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1); return false;"> (', $txt['smileys_add_code'], ')<\a><\span>\');
-		}]]></add>
+
+function addAliases(newline, smileys_add_code)
+{
+	setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + '<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1, \'' + smileys_add_code + '\'); return false;"> (' + smileys_add_code + ')<\a><\span>');
+}
+]]></add>
 	</operation>
 </file>
 </modification>

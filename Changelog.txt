@@ -1,2 +1,6 @@
+v1.1 - March 29th, 2016
+o Added support for SMF 2.1 Beta 2.
+o Removed unnecessary closing table bracket from install file for SMF 2.0.x.
+
 v1.0 - March 20th, 2016
 o Initial release to the public

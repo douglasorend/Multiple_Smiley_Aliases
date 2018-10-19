@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]MULTIPLE SMILEY ALIASES v1.0[/b][/size][/color]
+[center][color=red][size=16pt][b]MULTIPLE SMILEY ALIASES v1.1[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4101]Link to Mod[/url]
 [/center]
 [hr]
@@ -16,7 +16,7 @@ o [url=http://www.simplemachines.org/community/index.php?topic=543963]Multiple c
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
 This mod was originally written as a paid request for [url=http://biology-forums.com/]Biology Forums Community[/url] for SMF 1.1.21, but it may work with earlier versions of SMF 1.1.  Biology Forums Community has granted permission to distribute the paid work.  Thank you, Biology Forums Community!
 
-This mod was rewritten for SMF 2.0.11, but may work on SMF 2.0 and up.  SMF 1.0.x is not and will not be supported.
+This mod was rewritten for SMF 2.0.11 and SMF 2.1 Beta 2, but may work on SMF 2.0 and up.  SMF 1.0.x is not and will not be supported.
 
 [color=blue][b][size=12pt][u]Changelog[/u][/size][/b][/color]
 The changelog has been removed and can be seen at [url=http://www.xptsp.com/board/index.php?topic=672.msg997#msg997]XPtsp.com[/url].

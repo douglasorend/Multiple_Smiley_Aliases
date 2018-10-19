@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>Dougiefresh:MultiSmileyAlias</id>
+	<name>Multiple Smiley Aliases</name>
+	<type>modification</type>
+	<version>1.0</version>
+
+	<install for="1.1.1-1.1.99">
+		<readme parsebbc="true">readme.txt</readme>
+		<code>db_install.php</code>
+		<modification>install_11x.xml</modification>
+		<modification>language_english.xml</modification>
+	</install>
+	<uninstall for="1.1.1-1.1.99">
+		<modification reverse="true">install_11x.xml</modification>
+		<modification reverse="true">language_english.xml</modification>
+	</uninstall>
+
+	<install for="2.0 - 2.0.99">
+		<readme parsebbc="true">readme.txt</readme>
+		<code>db_install.php</code>
+		<modification>install_20x.xml</modification>
+		<modification>language_english.xml</modification>
+	</install>
+	<uninstall for="2.0 - 2.0.99">
+		<modification reverse="true">install_20x.xml</modification>
+		<modification reverse="true">language_english.xml</modification>
+	</uninstall>
+</package-info>

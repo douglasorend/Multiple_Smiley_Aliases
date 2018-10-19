@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<id>Dougiefresh:MultiSmileyAlias</id>
+<name>Multiple Smiley Aliases</name>
+<version>1.0</version>
+
+<!-------------------------------------------------------------------------->
+<!-- Source file modifications                                            -->
+<!-------------------------------------------------------------------------->
+<file name="$sourcedir/ManageSmileys.php">
+	<!-- addSmiley function -->
+	<operation>
+		<search position="replace"><![CDATA[$_POST['smiley_filename'] = htmltrim__recursive($_POST['smiley_filename']);
+
+		// Make sure some code was entered.]]></search>
+		<add><![CDATA[$_POST['smiley_filename'] = htmltrim__recursive($_POST['smiley_filename']);
+
+		// Get the aliases specified by the user:
+		if (is_array($_POST['smiley_aliases']))
+		{
+			foreach ($_POST['smiley_aliases'] as $i => $value)
+				if ($value == '')
+					unset($_POST['smiley_aliases'][$i]);
+			$aliases = $_POST['smiley_aliases'];
+		}
+		else
+			$aliases = explode("\n", strtr($_POST['smiley_aliases'], array("\r" => '')));
+
+		// Make sure some code was entered.]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[// Check whether the new code has duplicates. It should be unique.
+		$request = $smcFunc['db_query']('', '
+			SELECT id_smiley
+			FROM {db_prefix}smileys
+			WHERE code = {raw:mysql_binary_statement} {string:smiley_code}',
+			array(
+				'mysql_binary_statement' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
+				'smiley_code' => $_POST['smiley_code'],
+			)
+		);
+		if ($smcFunc['db_num_rows']($request) > 0)
+			fatal_lang_error('smiley_not_unique');
+		$smcFunc['db_free_result']($request);
+
+		// If we are uploading - check all the smiley sets are writable!]]></search>
+		<add><![CDATA[foreach (array_merge(array($_POST['smiley_code']), $aliases) as $code)
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_smiley
+				FROM {db_prefix}smileys
+				WHERE (code = {raw:mysql_binary_statement} {string:smiley_code} OR FIND_IN_SET(aliases, {string:smiley_code}))',
+				array(
+					'mysql_binary_statement' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
+					'smiley_code' => $_POST['smiley_code'],
+				)
+			);
+			if ($smcFunc['db_num_rows']($request) > 0)
+				fatal_lang_error('smiley_not_unique');
+			$smcFunc['db_free_result']($request);
+		}
+
+		// If we are uploading - check all the smiley sets are writable!]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[
+			),
+			array(
+				$_POST['smiley_code'], $_POST['smiley_filename'], $_POST['smiley_description'], $_POST['smiley_location'], $smiley_order,]]></search>
+		<add><![CDATA[ 'aliases' => 'string',
+			),
+			array(
+				$_POST['smiley_code'], $_POST['smiley_filename'], $_POST['smiley_description'], $_POST['smiley_location'], $smiley_order, htmltrim__recursive(implode(',', $aliases)),]]></add>
+	</operation>
+
+	<!-- EditSmileys function -->
+	<operation>
+		<search position="replace"><![CDATA[$_POST['smiley_location'] = empty($_POST['smiley_location']) || $_POST['smiley_location'] > 2 || $_POST['smiley_location'] < 0 ? 0 : (int) $_POST['smiley_location'];
+
+				// Make sure some code was entered.]]></search>
+		<add><![CDATA[$_POST['smiley_location'] = empty($_POST['smiley_location']) || $_POST['smiley_location'] > 2 || $_POST['smiley_location'] < 0 ? 0 : (int) $_POST['smiley_location'];
+
+				// Get the aliases specified by the user:
+				if (is_array($_POST['smiley_aliases']))
+				{
+					foreach ($_POST['smiley_aliases'] as $i => $value)
+						if ($value == '')
+							unset($_POST['smiley_aliases'][$i]);
+					$aliases = $_POST['smiley_aliases'];
+				}
+				else
+					$aliases = explode("\n", strtr($_POST['smiley_aliases'], array("\r" => '')));
+
+				// Make sure some code was entered.]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[$request = $smcFunc['db_query']('', '
+					SELECT id_smiley
+					FROM {db_prefix}smileys
+					WHERE code = {raw:mysql_binary_type} {string:smiley_code}' . (empty($_POST['smiley']) ? '' : '
+						AND id_smiley != {int:current_smiley}'),
+					array(
+						'current_smiley' => $_POST['smiley'],
+						'mysql_binary_type' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
+						'smiley_code' => $_POST['smiley_code'],
+					)
+				);
+				if ($smcFunc['db_num_rows']($request) > 0)
+					fatal_lang_error('smiley_not_unique');
+				$smcFunc['db_free_result']($request);
+
+				$smcFunc['db_query']('', ']]></search>
+		<add><![CDATA[foreach (array_merge(array($_POST['smiley_code']), $aliases) as $code)
+				{
+					$request = $smcFunc['db_query']('', '
+						SELECT id_smiley
+						FROM {db_prefix}smileys
+						WHERE (code = {raw:mysql_binary_type} {string:smiley_code}  OR FIND_IN_SET(aliases, {string:smiley_code}))' . (empty($_POST['smiley']) ? '' : '
+							AND id_smiley != {int:current_smiley}'),
+						array(
+							'current_smiley' => $_POST['smiley'],
+							'mysql_binary_type' => $smcFunc['db_title'] == 'MySQL' ? 'BINARY' : '',
+							'smiley_code' => $_POST['smiley_code'],
+						)
+					);
+					if ($smcFunc['db_num_rows']($request) > 0)
+						fatal_lang_error('smiley_not_unique');
+					$smcFunc['db_free_result']($request);
+				}
+
+				$smcFunc['db_query']('', ']]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[hidden = {int:smiley_location}
+					WHERE id_smiley = {int:current_smiley}',
+					array(]]></search>
+		<add><![CDATA[hidden = {int:smiley_location},
+						aliases = {string:smiley_aliases}
+					WHERE id_smiley = {int:current_smiley}',
+					array(
+						'smiley_aliases' => htmltrim__recursive(implode(',', $aliases)),]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[}
+
+		$request = $smcFunc['db_query']('', '
+			SELECT id_smiley AS id, code, filename, description, hidden AS location, 0 AS is_new]]></search>
+		<add><![CDATA[, aliases]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description']);]]></search>
+		<add><![CDATA[
+
+		if ($context['current_smiley']['aliases'] == '')
+			$context['current_smiley']['aliases'] = array();
+		else
+			$context['current_smiley']['aliases'] = explode(',', htmlspecialchars($context['current_smiley']['aliases']));]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[),
+				),
+				'filename' => array(]]></search>
+		<add><![CDATA[),
+				),
+				'aliases' => array(
+					'header' => array(
+						'value' => $txt['smileys_aliases'],
+					),
+					'data' => array(
+						'function' => create_function('$rowData', '
+							return empty($rowData["aliases"]) ? "" : str_replace(",", "<br />", $rowData["aliases"]);
+						'),
+					),
+					'sort' => array(
+						'default' => 'aliases',
+						'reverse' => 'aliases DESC',
+					]]></add>
+	</operation>
+
+	<!-- list_getSmileys function -->
+	<operation>
+		<search position="before"><![CDATA[global $smcFunc;
+
+	$request = $smcFunc['db_query']('', '
+		SELECT id_smiley, code, filename, description, smiley_row, smiley_order, hidden]]></search>
+		<add><![CDATA[, aliases]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Subs.php">
+	<!-- parseSmileys function -->
+	<operation>
+		<search position="before"><![CDATA[static $smileyPregSearch = array(), $smileyPregReplacements = array()]]></search>
+		<add><![CDATA[, $smileyalias = array()]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[SELECT code, filename, description]]></search>
+		<add><![CDATA[, aliases]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$smileysdescs[] = $row['description'];]]></search>
+		<add><![CDATA[
+
+					if (!empty($row['aliases']))
+					{
+						foreach (explode(',', $row['aliases']) as $code)
+						{
+							$smileysfrom[] = $code;
+							$smileysto[] = $row['filename'];
+							$smileysdescs[] = $row['description'];
+						}
+					}]]></add>
+	</operation>
+</file>
+
+<!-------------------------------------------------------------------------->
+<!-- Template file modifications                                          -->
+<!-------------------------------------------------------------------------->
+<file name="$themedir/ManageSmileys.template.php">
+	<!-- template_modifysmiley function -->
+	<operation>
+		<search position="before"><![CDATA[<input type="text" name="smiley_code" id="smiley_code" value="', $context['current_smiley']['code'], '" class="input_text" />]]></search>
+		<add><![CDATA[
+						</dd>
+						<dt>
+							<strong><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </strong>
+						</dt>
+						<dd>';
+			if (count($context['current_smiley']['aliases']) > 0)
+				foreach ($context['current_smiley']['aliases'] as $i => $code)
+					echo ($i > 0 ? '<br />' : '') . '
+					<input type="text" name="smiley_aliases[]" value="', $code, '" />'; 
+		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', count($context['current_smiley']['aliases']) > 0, '); return false;">(', $txt['smileys_add_code'], ')</a></span></td>]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+	// ]]]]><![CDATA[></script>';
+}
+
+// Adding a new smiley.]]></search>
+		<add><![CDATA[
+		function addAliases(newline)
+		{
+			setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + \'<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1); return false;"> (', $txt['smileys_add_code'], ')<\a><\span>\');
+		}]]></add>
+	</operation>
+
+	<!-- template_addsmiley function -->
+	<operation>
+		<search position="before"><![CDATA[<input type="text" name="smiley_code" id="smiley_code" value="" class="input_text" />]]></search>
+		<add><![CDATA[
+						</dd>
+						<dt>
+							<strong><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </strong>
+						</dt>
+						<dd>';
+			if (count($context['current_smiley']['aliases']) > 0)
+				foreach ($context['current_smiley']['aliases'] as $i => $code)
+					echo ($i > 0 ? '<br />' : '') . '
+					<input type="text" name="smiley_aliases[]" value="', $code, '" />'; 
+		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', count($context['current_smiley']['aliases']) > 0, '); return false;">(', $txt['smileys_add_code'], ')</a></span></td>]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+	// ]]]]><![CDATA[></script>';
+}
+
+// Ordering smileys.]]></search>
+		<add><![CDATA[
+		function addAliases(newline)
+		{
+			setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + \'<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1); return false;"> (', $txt['smileys_add_code'], ')<\a><\span>\');
+		}]]></add>
+	</operation>
+</file>
+</modification>

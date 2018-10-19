@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<id>Dougiefresh:MultiSmileyAlias</id>
+<name>Multiple Smiley Aliases</name>
+<version>1.0</version>
+
+<file name="$languagedir/ManageSmileys.english.php">
+	<operation>
+		<search position="end" />
+		<add><![CDATA[
+$txt['smileys_aliases'] = 'Additional Code(s)';
+$txt['smileys_add_code'] = 'Add Code';
+$txt['smileys_aliases'] = 'Aliases';
+]]></add>
+	</operation>
+</file>
+</modification>

@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<id>Dougiefresh:MultiSmileyAlias</id>
+<name>Multiple Smiley Aliases</name>
+<version>1.0</version>
+
+<!-------------------------------------------------------------------------->
+<!-- Source file modifications                                            -->
+<!-------------------------------------------------------------------------->
+<file name="$sourcedir/ManageSmileys.php">
+	<!-- addSmiley function -->
+	<operation>
+		<search position="replace"><![CDATA[$_POST['smiley_filename'] = htmltrim__recursive($_POST['smiley_filename']);
+
+		// Make sure some code was entered.]]></search>
+		<add><![CDATA[$_POST['smiley_filename'] = htmltrim__recursive($_POST['smiley_filename']);
+
+		// Get the aliases specified by the user:
+		if (is_array($_POST['smiley_aliases']))
+		{
+			foreach ($_POST['smiley_aliases'] as $i => $value)
+				if ($value == '')
+					unset($_POST['smiley_aliases'][$i]);
+			$aliases = $_POST['smiley_aliases'];
+		}
+		else
+			$aliases = explode("\n", strtr($_POST['smiley_aliases'], array("\r" => '')));
+
+		// Make sure some code was entered.]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[$request = db_query("
+			SELECT ID_SMILEY
+			FROM {$db_prefix}smileys
+			WHERE code = BINARY '$_POST[smiley_code]'", __FILE__, __LINE__);
+		if (mysql_num_rows($request) > 0)
+			fatal_lang_error('smiley_not_unique');
+		mysql_free_result($request);
+
+		// If we are uploading - check all the smiley sets are writable!]]></search>
+		<add><![CDATA[foreach (array_merge(array($_POST['smiley_code']), $aliases) as $code)
+		{
+			$request = db_query("
+				SELECT ID_SMILEY
+				FROM {$db_prefix}smileys
+				WHERE (code = BINARY '$code' OR FIND_IN_SET(aliases, '$code'))" . (empty($_POST['smiley']) ? '' : "					
+					AND ID_SMILEY != $_POST[smiley]"), __FILE__, __LINE__);
+			if (mysql_num_rows($request) > 0)
+				fatal_lang_error('smiley_not_unique');
+			mysql_free_result($request);
+		}
+
+		// If we are uploading - check all the smiley sets are writable!]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[(code, filename, description, hidden, smileyOrder)
+			VALUES (]]></search>
+		<add><![CDATA[(aliases, code, filename, description, hidden, smileyOrder)
+			VALUES ('" . htmltrim__recursive(implode(',', $aliases)). "', ]]></add>
+	</operation>
+
+	<!-- EditSmileys function -->
+	<operation>
+		<search position="replace"><![CDATA[$_POST['smiley_location'] = empty($_POST['smiley_location']) || $_POST['smiley_location'] > 2 || $_POST['smiley_location'] < 0 ? 0 : (int) $_POST['smiley_location'];
+
+			// Make sure some code was entered.]]></search>
+		<add><![CDATA[$_POST['smiley_location'] = empty($_POST['smiley_location']) || $_POST['smiley_location'] > 2 || $_POST['smiley_location'] < 0 ? 0 : (int) $_POST['smiley_location'];
+
+			// Get the aliases specified by the user:
+			if (is_array($_POST['smiley_aliases']))
+			{
+				foreach ($_POST['smiley_aliases'] as $i => $value)
+					if ($value == '')
+						unset($_POST['smiley_aliases'][$i]);
+				$aliases = $_POST['smiley_aliases'];
+			}
+			else
+				$aliases = explode("\n", strtr($_POST['smiley_aliases'], array("\r" => '')));
+
+			// Make sure some code was entered.]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[$request = db_query("
+				SELECT ID_SMILEY
+				FROM {$db_prefix}smileys
+				WHERE code = BINARY '$_POST[smiley_code]'" . (empty($_POST['smiley']) ? '' : "
+					AND ID_SMILEY != $_POST[smiley]"), __FILE__, __LINE__);
+			if (mysql_num_rows($request) > 0)
+				fatal_lang_error('smiley_not_unique');
+			mysql_free_result($request);
+
+			db_query("]]></search>
+		<add><![CDATA[foreach (array_merge(array($_POST['smiley_code']), $aliases) as $code)
+			{
+				$request = db_query("
+					SELECT ID_SMILEY
+					FROM {$db_prefix}smileys
+					WHERE (code = BINARY '$code' OR FIND_IN_SET(aliases, '$code'))" . (empty($_POST['smiley']) ? '' : "					
+						AND ID_SMILEY != $_POST[smiley]"), __FILE__, __LINE__);
+				if (mysql_num_rows($request) > 0)
+					fatal_lang_error('smiley_not_unique');
+				mysql_free_result($request);
+			}
+
+			db_query("]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+				WHERE ID_SMILEY = $_POST[smiley]", __FILE__, __LINE__);]]></search>
+		<add><![CDATA[,
+					aliases = '" . htmltrim__recursive(implode(',', $aliases)) . "']]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+			FROM {$db_prefix}smileys
+			ORDER BY $context[sort]", __FILE__, __LINE__);]]></search>
+		<add><![CDATA[, aliases]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA['sets_not_found' => array(),]]></search>
+		<add><![CDATA[
+				'aliases' => explode(',', $row['aliases']),]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+			FROM {$db_prefix}smileys
+			WHERE ID_SMILEY = " . (int) $_REQUEST['smiley'], __FILE__, __LINE__);]]></search>
+		<add><![CDATA[, aliases]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$context['current_smiley']['description'] = htmlspecialchars($context['current_smiley']['description']);]]></search>
+		<add><![CDATA[
+
+		if ($context['current_smiley']['aliases'] == '')
+			$context['current_smiley']['aliases'] = array();
+		else
+			$context['current_smiley']['aliases'] = explode(',', htmlspecialchars($context['current_smiley']['aliases']));]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Subs.php">
+	<!-- parseSmileys function -->
+	<operation>
+		<search position="before"><![CDATA[static $smileyfromcache = array(), $smileytocache = array()]]></search>
+		<add><![CDATA[, $smileyalias = array()]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[SELECT code, filename, description]]></search>
+		<add><![CDATA[, aliases]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$smileysdescs[] = $row['description'];]]></search>
+		<add><![CDATA[
+
+					if (!empty($row['aliases']))
+					{
+						foreach (explode(',', $row['aliases']) as $code)
+						{
+							$smileysfrom[] = $code;
+							$smileysto[] = $row['filename'];
+							$smileysdescs[] = $row['description'];
+						}
+					}]]></add>
+	</operation>
+</file>
+
+<!-------------------------------------------------------------------------->
+<!-- Template file modifications                                          -->
+<!-------------------------------------------------------------------------->
+<file name="$themedir/ManageSmileys.template.php">
+	<!-- template_editsmileys function -->
+	<operation>
+		<search position="replace"><![CDATA[<td colspan="7" align="right" class="titlebg">]]></search>
+		<add><![CDATA[<td colspan="8" align="right" class="titlebg">]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[', $context['sort'] == 'code' ? '<b>' . $txt['smileys_code'] . '</b>' : '<a href="' . $scripturl . '?action=smileys;sa=editsmileys;sort=code">' . $txt['smileys_code'] . '</a>', ']]></search>
+		<add><![CDATA[
+				</td><td>
+					', $context['sort'] == 'aliases' ? '<b>' . $txt['smileys_aliases'] . '</b>' : '<a href="' . $scripturl . '?action=smileys;sa=editsmileys;sort=aliases">' . $txt['smileys_aliases'] . '</a>', ']]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[', $smiley['code'], ']]></search>
+		<add><![CDATA[
+				</td><td valign="top" style="font-family: monospace;">
+					', implode('<br />', $smiley['aliases']), ']]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[<td colspan="7" align="right">]]></search>
+		<add><![CDATA[<td colspan="8" align="right">]]></add>
+	</operation>
+	
+	<!-- template_modifysmiley function -->
+	<operation>
+		<search position="before"><![CDATA[<td><input type="text" name="smiley_code" value="', $context['current_smiley']['code'], '" /></td>]]></search>
+		<add><![CDATA[
+			</tr>
+			<tr class="windowbg2">
+				<td align="right" valign="top"><b><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </b></td>
+				<td>';
+		if (count($context['current_smiley']['aliases']) > 0)
+			foreach ($context['current_smiley']['aliases'] as $code)
+				echo '
+					<input type="text" name="smiley_aliases[]" value="', $code, '" />'; 
+		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', count($context['current_smiley']['aliases']) >0, '); return false;">(', $txt['smileys_add_code'], ')</a></span></td>]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+	// ]]]]><![CDATA[></script>';
+}
+
+// Adding a new smiley.]]></search>
+		<add><![CDATA[
+		function addAliases(newline)
+		{
+			setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + \'<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1); return false;"> (', $txt['smileys_add_code'], ')<\a><\span>\');
+		}]]></add>
+	</operation>
+
+	<!-- template_addsmiley function -->
+	<operation>
+		<search position="before"><![CDATA[<td width="60%"><input type="text" name="smiley_code" value="" /></td>]]></search>
+		<add><![CDATA[
+			</tr>
+			<tr class="windowbg2">
+				<td align="right" valign="top"><b><label for="smiley_code">', $txt['smileys_aliases'], '</label>: </b></td>
+				<td>';
+		if (count($context['current_smiley']['aliases']) > 0)
+			foreach ($context['current_smiley']['aliases'] as $code)
+				echo '
+					<input type="text" name="smiley_aliases[]" value="', $code, '" />'; 
+		echo ' <span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(', count($context['current_smiley']['aliases']) >0, '); return false;">(', $txt['smileys_add_code'], ')</a></span></td>]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+	// ]]]]><![CDATA[></script>';
+}
+
+// Ordering smileys.]]></search>
+		<add><![CDATA[
+		function addAliases(newline)
+		{
+			setOuterHTML(document.getElementById("addAliases"), (newline ? "<br />" : "") + \'<input type="text" name="smiley_aliases[]" /><span class="smalltext" id="addAliases"><a href="#" onclick="addAliases(1); return false;"> (', $txt['smileys_add_code'], ')<\a><\span>\');
+		}]]></add>
+	</operation>
+</file>
+</modification>

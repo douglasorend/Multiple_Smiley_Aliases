@@ -1,3 +1,7 @@
+v1.2 - October 18th, 2018
+o No functionality change.
+o Updated documentation to point to new website.
+
 v1.1 - March 29th, 2016
 o Added support for SMF 2.1 Beta 2.
 o Removed unnecessary closing table bracket from install file for SMF 2.0.x.

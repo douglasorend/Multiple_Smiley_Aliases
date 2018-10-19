@@ -5,7 +5,7 @@
 	<id>Dougiefresh:MultiSmileyAlias</id>
 	<name>Multiple Smiley Aliases</name>
 	<type>modification</type>
-	<version>1.1</version>
+	<version>1.2</version>
 
 	<install for="1.1.1-1.1.99">
 		<readme parsebbc="true">readme.txt</readme>

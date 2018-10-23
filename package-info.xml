@@ -5,17 +5,19 @@
 	<id>Dougiefresh:MultiSmileyAlias</id>
 	<name>Multiple Smiley Aliases</name>
 	<type>modification</type>
-	<version>1.2</version>
+	<version>1.3</version>
 
 	<install for="1.1.1-1.1.99">
 		<readme parsebbc="true">readme.txt</readme>
 		<code>db_install.php</code>
 		<modification>install_11x.xml</modification>
 		<modification>language_english.xml</modification>
+		<modification>language_spanish_latin.xml</modification>
 	</install>
 	<uninstall for="1.1.1-1.1.99">
 		<modification reverse="true">install_11x.xml</modification>
 		<modification reverse="true">language_english.xml</modification>
+		<modification reverse="true">language_spanish_latin.xml</modification>
 	</uninstall>
 
 	<install for="2.0 - 2.0.99">
@@ -23,10 +25,11 @@
 		<code>db_install.php</code>
 		<modification>install_20x.xml</modification>
 		<modification>language_english.xml</modification>
+		<modification>language_spanish_latin.xml</modification>
 	</install>
 	<uninstall for="2.0 - 2.0.99">
 		<modification reverse="true">install_20x.xml</modification>
-		<modification reverse="true">language_english.xml</modification>
+		<modification reverse="true">language_spanish_latin.xml</modification>
 	</uninstall>
 
 	<install for="2.1 Beta 2">
@@ -34,9 +37,11 @@
 		<code>db_install.php</code>
 		<modification>install_21x.xml</modification>
 		<modification>language_english.xml</modification>
+		<modification>language_spanish_latin.xml</modification>
 	</install>
 	<uninstall for="2.1 Beta 2">
 		<modification reverse="true">install_21x.xml</modification>
 		<modification reverse="true">language_english.xml</modification>
+		<modification reverse="true">language_spanish_latin.xml</modification>
 	</uninstall>
 </package-info>
